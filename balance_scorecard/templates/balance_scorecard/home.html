@@ -1,0 +1,1055 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+    
+    <!-- Iconos CSS -->
+    <link rel="stylesheet" href="{% static 'css2/fontello.css' %}">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}">
+    <!-- Font awesome CSS -->
+    <link rel="stylesheet" href="{% static 'assets/fonts/font-awesome-4.7.0/css/font-awesome.min.css' %}">
+      
+<style media="screen">
+.invalid {
+  color: #dc3545;
+  font-size: 80%;
+}
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+.footer {
+  margin: auto 0 0;
+  height: 56px;
+}
+</style>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="{% static 'assets/js/utils.js' %}"></script>
+<title>Prototipo v2.0</title>
+</head>
+  {% include "_modal.html" %}
+<body>
+  {% if not user.is_anonymous and user.is_superuser  %}
+
+<header>
+  <input type="checkbox" id="btn-menu">
+  <label for="btn-menu" class="icon-menu"></label>
+  <nav class="menu">
+    <ul>
+      <li class="submenu"><a href="{% url 'index'%}">Horcones 2<span></span></a>
+      <li><a href="{% url 'index'%}">Inicio<span class="icon-home"></span></a></li>
+      <li class="submenu"><a href="#">Listas<span class="icon-down-open"></span></a>
+        <ul>
+          <li><a href="{% url 'lista_incidentes' %}">Lista Incidentes</a></li>
+          <li><a href="{% url 'lista_compromisos' %}">Lista Compromisos</a></li>
+          <li><a href="{% url 'lista_reunion' %}">Lista Reuniones</a></li>
+        </ul>
+      </li>
+      <li class="submenu"><a href="#">Indicadores<span class="icon-down-open"></span></a>
+        <ul>
+          <li><a href="{% url 'balancedscorecard' 1 %}">Indicadores Financieros</a></li>
+          <li><a href="{% url 'balancedscorecard' 2 %}">Indicadores Clientes</a></li>
+          <li><a href="{% url 'balancedscorecard' 3 %}">Indicadores Procesos Internos</a></li>
+          <li><a href="{% url 'balancedscorecard' 4 %}">Indicadores Aprendizaje y Crecimiento</a></li>
+        </ul>
+      </li>
+      <li><a href="{% url 'reporte_indicadores' %}">Reporte Indicadores</a></li>
+      <li><a href="{% url 'logout' %}">Cerrar Sesión</a></li>
+    </ul>
+  </nav>
+</header>
+{% include "_header.html" %}
+<div class="contenedor">
+        <div class="row">
+          <div class="main">
+            <a class="navbar-brand"><h2>Horcones 2</h2></a>
+              </br><span><h4>Detalle</h4></span>
+              <table class="table table-bordered table-striped">
+                    {% for i in indicador %}
+                    <tr>
+                      <th class="text-center">Nombre Indicador</th>
+                      <td class="text-center">{{ i.indicador.nombre_kpi }}</td>
+
+                    </tr>
+                    <tr>
+                      <th class="text-center">Meta</th>
+                      <td class="text-center">{{ i.indicador.meta_kpi }}</td>
+                    </tr>
+                    <tr>
+                      <th class="text-center">Acumulado</th>
+                      <td class="text-center">{{ update.acumulado }} ({{ i.indicador.unidad_medida }})</td>
+                    </tr>
+                    <tr>
+                      <th class="text-center">Porcentaje %</th>
+                      <td class="text-center">{{ update.porcentaje }}%</td>
+                    </tr>
+                    <tr>
+                      <th class="text-center">Valor Hoy</th>
+                      <td class="text-center">{{ i.valor_kpi }}
+                      {% if i.indicador.responsable.id == user.id %}
+                        <button type="button" class="info-kpi btn btn-sm btn-primary" data-id="{% url 'actualizar_info' i.pk %}">
+                          <span class="fa fa-pencil"></span>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th class="text-center">Proyectado</th>
+                      <td class="text-center">{{ update.proyeccion }}</td>
+                    </tr>
+                    <tr>
+                      <th class="text-center">Ultimo Registro</th>
+                      <td class="text-center">{{ i.fecha_modificacion  }}</td>
+                    </tr>
+                    {% endif%}
+                    {% endfor %}
+               </table>
+                <div class="col-12 mb-3">
+                  {% if indicador %}
+                   <div class="row" >
+<!--CHART BARRA ADMIN-->
+                        <canvas id="myChart2" class="box"></canvas>
+                       <!-- <canvas id="canvas" class="box"></canvas>-->
+<!--CHART GAUGE ADMIN-->                     
+                  <div class="col-md-4 mb-5">
+                      <div id="chartdiv1" style="text-align: center;" ></div>
+                        <div class="card-body">
+                          <h4 class="card-title">{{ nombre_kpi }}</h4>
+                          <p class="card-text">{{ descripcion_kpi }}</p>
+                        </div>
+                    </div>
+                  </div>
+                    <td class="text-center">
+                      <a class="btn btn-danger" href="{% url 'index' %}">Volver</a>
+                    </td>
+                  {% else %}
+                    <p class="no-books text-primary">No Existen Registros</p>
+                    <div class="row">
+                      <td class="text-center">
+                        <a class="btn btn-danger" href="{% url 'index' %}">Volver</a>
+                      </td>
+                    </div>
+                  {% endif %}
+              </div>
+        </div>
+    </div>    
+</div>
+            {% else %}
+            {% if not user.is_anonymous and user.is_staff and not user.is_superuser %}
+            <!--                                                Usuario Gerente-->
+<header>
+  <input type="checkbox" id="btn-menu">
+  <label for="btn-menu" class="icon-menu"></label>
+  <nav class="menu">
+    <ul>
+      <li class="submenu"><a href="{% url 'index'%}">Horcones 2<span></span></a>
+      <li><a href="{% url 'index'%}">Inicio<span class="icon-home"></span></a></li>
+      <li class="submenu"><a href="#">Listas<span class="icon-down-open"></span></a>
+        <ul>
+          <li><a href="{% url 'lista_incidentes' %}">Lista Incidentes</a></li>
+          <li><a href="{% url 'lista_compromisos' %}">Lista Compromisos</a></li>
+          <li><a href="{% url 'lista_reunion' %}">Lista Reuniones</a></li>
+        </ul>
+      </li>
+      <li class="submenu"><a href="#">Indicadores<span class="icon-down-open"></span></a>
+        <ul>
+          <li><a href="{% url 'balancedscorecard' 1 %}">Indicadores Financieros</a></li>
+          <li><a href="{% url 'balancedscorecard' 2 %}">Indicadores Clientes</a></li>
+          <li><a href="{% url 'balancedscorecard' 3 %}">Indicadores Procesos Internos</a></li>
+          <li><a href="{% url 'balancedscorecard' 4 %}">Indicadores Aprendizaje y Crecimiento</a></li>
+        </ul>
+      </li>
+      <li><a href="{% url 'reporte_indicadores' %}">Reporte Indicadores</a></li>
+      <li><a href="{% url 'logout' %}">Cerrar Sesión</a></li>
+    </ul>
+  </nav>
+</header>
+{% include "_header.html" %}
+<div class="contenedor">
+    <a class="navbar-brand"><h2>Horcones 2</h2></a>
+      <div class="container mt-3">
+        <div class="row">
+          <div class="col">
+            <div cls="row">
+              <div class="col-12 mb-3">
+                <span><h4><strong>Detalle</strong></h4>
+                </span>
+                <div class="col-12 mb-3">
+                {% if indicador %}
+                    <div class="row" >
+                      <div class="col-md-4 mb-5">
+                        <div class="card h-100">
+                         <div id="chartdiv1" class="chart" ></div>
+                          <div class="card-body">
+                            <h4 class="card-title">{{ indicador.indicador.nombre_kpi }}</h4>
+                            <p class="card-text">Descripción/Observación</p>
+                          </div>
+                        </div>
+                      </div>
+                 <!-- HTML -->
+                  <div class="col-md-4 mb-5" style="margin-left: 160px">
+                        <div class="card h-100">
+                          <canvas id="myChart2" height="400" width="500" ></canvas>
+                        </div>
+                      </div>
+                     <canvas id="canvas"></canvas>
+                  </div>
+	                <table class="table table-bordered table-striped">
+                    <tr>
+                      <th class="text-center">Nombre Indicador</th>
+                      <td class="text-center">{{ indicador.indicador.nombre_kpi }}</td>
+                    </tr>
+                    <tr>
+                      <th class="text-center">Meta</th>
+                      <td class="text-center">{{ indicador.indicador.meta_kpi }}</td>
+                    </tr>
+                    <tr>
+                      <th class="text-center">Acumulado</th>
+                      <td class="text-center">{{ update.acumulado }} ({{ indicador.indicador.unidad_medida }})</td>
+                    </tr>
+                    <tr>
+                      <th class="text-center">Porcentaje %</th>
+                      <td class="text-center">{{ update.porcentaje }}%</td>
+                    </tr>
+                    <tr>
+                      <th class="text-center">Valor Hoy</th>
+                      <td class="text-center">{{ indicador.valor_kpi }}</td>
+                    </tr>
+                    <tr>
+                      <th class="text-center">Porcentaje %</th>
+                      <td class="text-center">{{ update.proyeccion }}</td>
+                    </tr>
+                    <tr>
+                      <th class="text-center">Ultimo Registro</th>
+                      <td class="text-center">{{ indicador.fecha_modificacion  }}</td>
+                    </tr>
+               </table> 
+              </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12 mb-3">
+          <div class="row">
+            <div class="col-12 mb-3">
+
+                <td class="text-center">
+                    <a class="btn btn-danger" href="{% url 'index' %}">Volver</a>
+                  </td>
+                {% else %}
+                  <p class="no-books text-primary">No Existen Registros</p>
+                  <div class="row">
+                      <td class="text-center">
+                        <a class="btn btn-danger" href="{% url 'index' %}">Volver</a>
+                      </td>
+                    </div>
+                {% endif %}
+              </div>
+          </div>
+        </div>
+      </div>
+          {% else %}
+          {% if not user.is_anonymous and not user.is_staff and not user.is_superuser %}
+<!--                                                                            Usuario Normal                                                                            -->
+        <header>
+          <input type="checkbox" id="btn-menu">
+          <label for="btn-menu" class="icon-menu"></label>
+          <nav class="menu">
+            <ul>
+              <li class="submenu"><a href="{% url 'index'%}">Horcones 2<span></span></a>
+              <li><a href="{% url 'index'%}">Inicio<span class="icon-home"></span></a></li>
+              <li><a href="{% url 'logout' %}">Cerrar Sesión</a></li>
+            </ul>
+          </nav>
+        </header>
+      <div class="contenedor">
+        <div class="row">
+          <div class="main">
+            <a class="navbar-brand"><h2>Horcones 2</h2></a>
+              </br><span><h4>Detalle</h4></span>
+              <table class="table table-bordered table-striped">
+                    {% for i in indicador %}
+                    <tr>
+                      <th class="text-center">Nombre Indicador</th>
+                      <td class="text-center">{{ i.indicador.nombre_kpi }}</td>
+
+                    </tr>
+                    <tr>
+                      <th class="text-center">Meta</th>
+                      <td class="text-center">{{ i.indicador.meta_kpi }}</td>
+                    </tr>
+                    <tr>
+                      <th class="text-center">Acumulado</th>
+                      <td class="text-center">{{ update.acumulado }} ({{ i.indicador.unidad_medida }})</td>
+                    </tr>
+                    <tr>
+                      <th class="text-center">Porcentaje %</th>
+                      <td class="text-center">{{ update.porcentaje }}%</td>
+                    </tr>
+                    <tr>
+                      <th class="text-center">Valor Hoy</th>
+                      <td class="text-center">{{ i.valor_kpi }}
+                      {% if i.indicador.responsable.id == user.id %}
+                        <button type="button" class="info-kpi btn btn-sm btn-primary" data-id="{% url 'actualizar_info' i.pk %}">
+                          <span class="fa fa-pencil"></span>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th class="text-center">Proyectado</th>
+                      <td class="text-center">{{ update.proyeccion }}</td>
+                    </tr>
+                    <tr>
+                      <th class="text-center">Ultimo Registro</th>
+                      <td class="text-center">{{ i.fecha_modificacion  }}</td>
+                    </tr>
+                    {% endif%}
+                    {% endfor %}
+               </table>
+                <div class="col-12 mb-3">
+                  {% if indicador %}
+                   <div class="row" >
+<!--CHART BARRA JEFE-->
+                        <canvas id="myChart2" class="box"></canvas>
+                        <canvas id="canvas" class="box"></canvas>
+<!--CHART GAUGE JEFE-->                     
+                  <div class="col-md-4 mb-5">
+                      <div id="chartdiv1" style="text-align: center;" ></div>
+                        <div class="card-body">
+                          <h4 class="card-title">{{ nombre_kpi }}</h4>
+                          <p class="card-text">{{ descripcion_kpi }}</p>
+                        </div>
+                    </div>
+                  </div>
+                    <td class="text-center">
+                      <a class="btn btn-danger" href="{% url 'index' %}">Volver</a>
+                    </td>
+                  {% else %}
+                    <p class="no-books text-primary">No Existen Registros</p>
+                    <div class="row">
+                      <td class="text-center">
+                        <a class="btn btn-danger" href="{% url 'index' %}">Volver</a>
+                      </td>
+                    </div>
+                  {% endif %}
+              </div>
+        </div>
+    </div>    
+</div>
+            {% else %}
+          <button class="login-btn btn btn-primary" type="button" name="button">Log in</button>
+        {% endif %}
+          {% endif %}
+            {% endif %}
+        </div>
+      </div>
+      </div>
+      </div>
+      </div>
+      </div>
+      </body>
+      </html>
+        
+
+
+
+{% block extrascripts %}
+
+  <script type="text/javascript">
+    $(function () {
+      // Log in & Sign up buttons
+      $(".login-btn").modalForm({formURL: "{% url 'login' %}"});
+      $(".signup-btn").modalForm({formURL: "{% url 'registro' %}"});
+
+      // Create book button
+      $(".create-book").modalForm({formURL: "{% url 'crear' %}"});
+        // crear informacion kpi
+      $(".info-kpi").each(function () {
+        $(this).modalForm({formURL: $(this).data('id')});
+      });
+
+      // Update book buttons
+      $(".update-book").each(function () {
+        $(this).modalForm({formURL: $(this).data('id')});
+      });
+
+      // Read book buttons
+      $(".read-book").each(function () {
+        $(this).modalForm({formURL: $(this).data('id')});
+      });
+
+      // Delete book buttons
+      $(".delete-book").each(function () {
+        $(this).modalForm({formURL: $(this).data('id')});
+      })
+
+      // Hide message
+      $(".alert").fadeTo(2000, 500).slideUp(500, function(){
+        $(".alert").slideUp(500);
+      });
+
+    });
+  </script>
+
+  <!-- Resources -->
+    <script src="https://www.amcharts.com/lib/4/core.js"></script>
+    <script src="https://www.amcharts.com/lib/4/charts.js"></script>
+    <script src="https://www.amcharts.com/lib/4/themes/animated.js"></script>
+
+    <script src="https://www.amcharts.com/lib/4/core.js"></script>
+    <script src="https://www.amcharts.com/lib/4/charts.js"></script>
+    <script src="https://www.amcharts.com/lib/4/themes/animated.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+    <script src="{% static 'assets/js/jquery-3.2.1.min.js' %}"></script>
+    <script src="{% static 'assets/js/popper.min.js' %}"></script>
+    <script src="{% static 'assets/js/bootstrap.min.js' %}"></script>
+<!-- You can alternatively load the minified version -->
+    <script src="{% static 'js/jquery.bootstrap.modal.forms.js' %}"></script>
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<!-- Chart code -->
+
+<!-- Resources -->
+    <script src="https://www.amcharts.com/lib/4/core.js"></script>
+    <script src="https://www.amcharts.com/lib/4/charts.js"></script>
+    <script src="https://www.amcharts.com/lib/4/themes/animated.js"></script>
+    <script type="text/javascript" src="https://cdn.fusioncharts.com/fusioncharts/latest/fusioncharts.js"></script>
+    <!-- Step 2 - Include the fusion theme -->
+    <script type="text/javascript" src="https://cdn.fusioncharts.com/fusioncharts/latest/themes/fusioncharts.theme.fusion.js"></script>
+    <script type="text/javascript"></script>
+
+
+<script>
+  var meta1 = "{{ indicador.indicador.meta_kpi}}"
+  var acum = "{{ update.acumulado }}"
+  var porc = "{{ update.porcentaje }}"
+  console.log(meta1)
+  console.log(acum)
+  const dataSource = {
+  chart: {
+    caption: parseInt(meta1*0.35),
+    subcaption: "{{ indicador.fecha_modificacion  }}",
+    lowerlimit: "0",
+    upperlimit: "100",
+    showvalue: "1",
+    numbersuffix: "%",
+    theme: "fusion"
+  },
+  colorrange: {
+    color: [
+      {
+        minvalue: 0,
+        maxvalue: 50,
+        code: "#F2726F"
+      },
+      {
+        minvalue: 50,
+        maxvalue: 70,
+        code: "#FFC533"
+      },
+      {
+        minvalue: 80,
+        maxvalue: 100,
+        code: "#62B58F"
+      }
+    ]
+  },
+  dials: {
+    dial: [
+      {
+        value: parseFloat(porc),
+        tooltext: "<b>9%</b> Actualmente"
+      }
+    ]
+  },
+  trendpoints: {
+    point: [
+      {
+        startvalue: meta1,
+        displayvalue: "Meta",
+        thickness: "2",
+        color: "#E15A26",
+        usemarker: "1",
+        markerbordercolor: "#E15A26",
+        markertooltext: "Meta"
+      }
+    ]
+  }
+};
+
+FusionCharts.ready(function() {
+  var myChart = new FusionCharts({
+    type: "angulargauge",
+    renderAt: "chartdiv1",
+    width: "100%",
+    height: "100%",
+    dataFormat: "json",
+    dataSource
+  }).render();
+});
+</script>
+<!-- Grafico Gauge gerente -->
+
+</script>
+<style>
+#chartdiv1 {
+  width: 350px;
+  height: 225px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.card{
+  width: 150% !important;
+}
+</style>
+
+{% endblock extrascripts %}
+
+{% block jquery %} 
+<script>
+function getUrl(){
+     //Se obtiene el valor de la URL desde el navegador
+     var actual = window.location+'';
+     //Se realiza la división de la URL
+     var split = actual.split("/");
+     //Se obtiene el ultimo valor de la URL
+     var id = split[split.length-1];
+     console.log(id);
+     return id
+}
+
+var endpoint = '/api/chart/data/'+getUrl()
+var defaultData = []
+var labels = [];
+var proyeccion = []
+var meta = []
+var fecha = ''
+var nombre =''
+var acumulado = []
+var unidad = ''
+console.log(unidad)
+$.ajax({
+    method: "GET",
+    url: endpoint,
+    success: function(data){
+        labels = data.labels
+        defaultData = data.default
+        proyeccion = data.proyeccion
+        meta = data.meta
+        fecha =data.fecha
+        nombre = data.nombre
+        acumulado = data.acumulado
+        unidad = data.medida
+        setCharts()
+        console.log(data)
+    },
+    error: function(error_data){
+        console.log('error')
+        console.log(error_data)
+        }
+    })
+
+function setCharts(){
+    var ctx2 = document.getElementById('myChart2');
+    var myChart = new Chart(ctx2, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Valores'+ ' '+'('+unidad+')',
+                data: defaultData,
+                backgroundColor: window.chartColors.red,
+					      borderColor: window.chartColors.red,
+            },
+            {
+              label: 'Meta'+ ' '+'('+unidad+')',
+              data: meta,
+              backgroundColor: window.chartColors.green,
+					    borderColor: window.chartColors.green,
+              fill: false,
+              borderDash:[5,5]
+            },
+            {
+              label: 'Acumulado'+ ' '+'('+unidad+')',
+              data: acumulado,
+              backgroundColor: window.chartColors.yellow,
+					    borderColor: window.chartColors.yellow,
+              fill: true,
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+
+		var config = {
+			type: 'bar',
+			data: {
+				labels: labels,
+				datasets: [{
+					label: 'Valor Diario',
+					backgroundColor: window.chartColors.red,
+					borderColor: window.chartColors.red,
+					data: defaultData,
+					fill: true,
+				}, {
+					label: 'Proyeccion meta',
+					fill: false,
+					backgroundColor: window.chartColors.blue,
+					borderColor: window.chartColors.blue,
+          data: proyeccion,
+          hidden:true
+				},{
+          type:'line',
+					label: 'Meta',
+					fill: false,
+					backgroundColor: window.chartColors.green,
+					borderColor: window.chartColors.green,
+          data: meta,
+          borderDash:[5,5]
+				},{
+					label: 'Acumulado',
+					fill: true,
+					backgroundColor: window.chartColors.yellow,
+					borderColor: window.chartColors.yellow,
+					data: acumulado,
+				}]
+			},
+			options: {
+				responsive: true,
+				title: {
+					display: true,
+					text: 'Nombre Indicador: '+nombre + ' '+'('+unidad+')'
+				},
+				tooltips: {
+					mode: 'index',
+					intersect: false,
+				},
+				hover: {
+					mode: 'nearest',
+					intersect: true
+				},
+				scales: {
+					xAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Fecha'
+						}
+					}],
+					yAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Valor'+ ' '+'('+unidad+')'
+						}
+					}]
+				}
+			}
+		};
+
+		window.onload = function() {
+			var ctx = document.getElementById('canvas').getContext('2d');
+			window.myLine = new Chart(ctx, config);
+		};
+
+		var colorNames = Object.keys(window.chartColors);	
+}
+
+</script>
+
+  
+
+  <style>
+  @import url(//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css);
+  @import url(https://fonts.googleapis.com/css?family=Titillium+Web:300);
+.fa-2x {
+font-size: 2em;
+}
+.fa {
+position: relative;
+display: table-cell;
+width: 60px;
+height: 36px;
+text-align: center;
+vertical-align: middle;
+font-size:20px;
+}
+
+
+.main-menu:hover,nav.main-menu.expanded {
+width:250px;
+overflow:visible;
+}
+
+.main-menu {
+background:#212121;
+border-right:1px solid #e5e5e5;
+position:fixed;
+top:0;
+bottom:0;
+height: auto;
+left:0;
+width:60px;
+overflow:hidden;
+-webkit-transition:width .05s linear;
+transition:width .05s linear;
+-webkit-transform:translateZ(0) scale(1,1);
+z-index:1000;
+}
+
+.main-menu>ul {
+margin:7px 0;
+}
+
+.main-menu li {
+position:relative;
+display:block;
+width:250px;
+}
+
+.main-menu li>a {
+position:relative;
+display:table;
+border-collapse:collapse;
+border-spacing:0;
+color:#999;
+ font-family: arial;
+font-size: 14px;
+text-decoration:none;
+-webkit-transform:translateZ(0) scale(1,1);
+-webkit-transition:all .1s linear;
+transition:all .1s linear;
+  
+}
+
+.main-menu .nav-icon {
+position:relative;
+display:table-cell;
+width:60px;
+height:36px;
+text-align:center;
+vertical-align:middle;
+font-size:18px;
+}
+
+.main-menu .nav-text {
+position:relative;
+display:table-cell;
+vertical-align:middle;
+width:190px;
+  font-family: 'Titillium Web', sans-serif;
+}
+
+.main-menu>ul.logout {
+position:absolute;
+left:0;
+bottom:0;
+}
+
+.no-touch .scrollable.hover {
+overflow-y:hidden;
+}
+
+.no-touch .scrollable.hover:hover {
+overflow-y:auto;
+overflow:visible;
+}
+
+a:hover,a:focus {
+text-decoration:none;
+}
+
+nav {
+-webkit-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+-o-user-select:none;
+user-select:none;
+}
+
+nav ul,nav li {
+outline:0;
+margin:0;
+padding:0;
+}
+.main-menu li:hover>a,nav.main-menu li.active>a,.dropdown-menu>li>a:hover,.dropdown-menu>li>a:focus,.dropdown-menu>.active>a,.dropdown-menu>.active>a:hover,.dropdown-menu>.active>a:focus,.no-touch .dashboard-page nav.dashboard-menu ul li:hover a,.dashboard-page nav.dashboard-menu ul li.active a {
+color:#fff;
+background-color:#5fa2db;
+}
+.area {
+float: left;
+background: #e2e2e2;
+width: 100%;
+height: 100%;
+}
+@font-face {
+  font-family: 'Titillium Web';
+  font-style: normal;
+  font-weight: 300;
+  src: local('Titillium WebLight'), local('TitilliumWeb-Light'), url(http://themes.googleusercontent.com/static/fonts/titilliumweb/v2/anMUvcNT0H1YN4FII8wpr24bNCNEoFTpS2BTjF6FB5E.woff) format('woff');
+}
+</style>
+
+<!-- Menu CSS -->
+<style>
+
+* {
+  margin:0;
+  padding: 0;
+  box-sizing: border-box;
+  }
+
+body {
+  margin: 0;
+  font-family: sans-serif;
+  color: #333; 
+}
+.contenedor{
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+.main{
+  width: 70%;
+  background: #fff;
+  padding: 20px;
+  float: left;
+  box-sizing: border-box;
+}
+aside{
+  width: 30%;
+  padding: 20px;
+  box-sizing: border-box;
+  background: #ccc;
+  float: left;
+}
+h1 {
+  text-align: center;
+  color: #333; 
+}
+.table-rwd {
+  font-size: .85em;
+  border: 1px solid rgba(181, 213, 144, 0.5);
+  color: #666;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto; }
+  .table-rwd td, .table-rwd th {
+    padding: .8em;
+    border-bottom: 1px solid rgba(181, 213, 144, 0.5); }
+  .table-rwd th {
+    background: #1A8CFF;
+    color: #fff;
+    font-weight: normal;
+    text-align: right; }
+  .table-rwd td {
+    text-align: right; }
+    .table-rwd td:before {
+      content: "";
+      color: #1A8CFF; }
+    .table-rwd td:after {
+      content: ""; }
+    .table-rwd td:first-of-type {
+      text-align: left; }
+      .table-rwd td:first-of-type:before {
+        content: ""; }
+      .table-rwd td:first-of-type:after {
+        content: ""; }
+  .table-rwd tr:hover {
+    background: rgba(181, 213, 144, 0.2); }
+  .table-rwd tr td:nth-child(2n) {
+    background: rgba(181, 213, 144, 0.2); }
+
+.table-container {
+  overflow-x: auto; }
+
+.table-rwd {
+  min-width: 900px; }
+  .table-rwd td:first-child {
+    position: absolute;
+    background: #fff;
+    width: 8em; }
+  .table-rwd th:first-child {
+    width: 8em; }
+  .table-rwd tr:hover td:first-child {
+    background: #1A8CFF;
+    color: #fff; }
+  .table-rwd tr:nth-child(2) td:first-child {
+    box-shadow: 0 -2.7em 0 -6px #1A8CFF, -6px -2.7em 0 -6px #1A8CFF; }
+
+header {
+  height: 55px;
+  background: #1A8CFF;
+  color: #fff;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  z-index: 1;
+}
+
+#btn-menu {
+  display: none;
+}
+
+header label{
+  font-size: 35px;
+  cursor: pointer;
+  display: none;
+}
+
+.menu ul{
+  background: #1A8CFF;
+  display: flex;
+  list-style: none;
+}
+.menu ul ul{
+  display: none;
+}
+.menu a{
+  display: block;
+  padding: 15px 20px;
+  color: #fff;
+  text-decoration: none;
+}
+.menu a:hover{
+  background: rgba(0, 0, 0, 0.3);
+}
+.menu a span{
+  margin-left: 5px;
+}
+.menu ul li:hover ul{
+  display: block;
+  position: absolute;
+}
+
+@media (max-width: 765px){
+  header label{
+    display: block;
+  }
+  .main{
+    width: 100%;
+  }
+  aside{
+    width: 100%;
+  }
+
+  .menu{
+    position:absolute;
+    top: 55px;
+    left: 0;
+    width: 100%;
+    transform: translateX(-100%);
+    transition:  all 0.3s;
+  }
+
+  .menu ul{
+    display:block;
+    background: #555;
+  }
+  .menu ul li:hover ul{
+    display: none;
+    position: static;
+  }
+  .menu a span{
+    position: absolute;
+    right: 5px;
+  }
+  #btn-menu:checked ~ .menu{
+    transform: translateX(0%);
+  }
+
+  .menu ul ul{
+    background: rgba(0, 0, 0, 4);
+  }
+  .menu ul ul a{
+    padding:15px 35px;
+
+  }
+  #container{
+    width: 10% !important;
+    background: #555;
+}
+  .container mt-3{
+    width: 10% !important;
+  }
+  #table{
+    width: 650px !important;
+  }
+}
+@media screen and (max-width: 400px){
+  .contenedor{
+    width: 100%;
+  }
+  aside{
+    display: none;
+  }
+}
+</style>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+      <script src="{% static 'assets/js/jquery-3.2.1.min.js' %}"></script>
+      <script src="{% static 'assets/js/popper.min.js' %}"></script>
+      <script src="{% static 'assets/js/bootstrap.min.js' %}"></script>
+      <script src="{% static 'js/jquery.bootstrap.modal.forms.js' %}"></script>
+      <script src="{% static 'vendor2/jquery/jquery.min.js' %}"></script>
+      <script src="{% static 'vendor2/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+      <script>
+        $(document).ready(function(){ 
+        $(".submenu").click(function(){ 
+        $(this).children("ul").slideToggle(); 
+        
+        var Grupo = $(this).parent();
+        var posicion = $(this).index();
+        Grupo.children().each(function (index) {
+        if (index != posicion)
+          $(this).children("ul").slideUp("slow");
+        });
+      })
+      
+        $("ul").click(function(p){ 
+        p.stopPropagation(); 
+      });
+      })
+      </script>
+
+      <style>
+          .contenedord{
+            width: 100%;
+            height: auto;
+            background: #007bbf;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+          }
+          .box{
+            width: 100%;
+            height: 300px;
+            margin:20px;
+            box-sizing: border-box;
+            font-size: 15px;
+          }
+          @media (max-width: 765px){
+            .box{
+              width: 100%;
+            }
+          }
+          </style>
+{% endblock %}

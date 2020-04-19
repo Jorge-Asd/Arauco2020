@@ -1,0 +1,1 @@
+web: gunicorn Prototipo_arauco.wsgi --log-file -

@@ -1,0 +1,100 @@
+
+{% block content %}
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Reporte Asistencias</title>
+</head>
+<body>
+  <h1><center>Reporte Asistencias</center></h1>
+  <h2><center>{{ fecha }}</center></h2>
+  <h2>Detalle Indicadores</h2>
+<div class="col-12 mb-3">
+  {% if id %}
+  <table class="table" border="1">
+    <thead>
+      <tr>
+        <th class="text-center" scope="col">#</th>
+        <th class="text-center" scope="col">Codigo</th>
+        <th class="text-center" scope="col">Nombre Indicador</th>
+        <th class="text-center" scope="col">Meta</th>
+        <th class="text-center" scope="col">Fecha Creacion</th>
+        <th class="text-center" scope="col">Descripcion</th>
+        <th class="text-center" scope="col">Responsable</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for i in id %}
+        <tr>
+          <th class="text-center" scope="row">{{ forloop.counter }}</th>
+          <th class="text-center" scope="row">{{ i.id }}</th>
+          {% for p in usuarios %}
+            <td class="text-center"><center>{{ p.username }}</center></td>
+          {% endfor %}
+          <td class="text-center"><center>{{ usuarios.0 }}</center></td>
+          <td class="text-center"><center>{{ presente }}</center></td>
+          <td class="text-center"><center>{{ i.indicador.descripcion_kpi }}</center></td>
+          <td class="text-center"><center>{{ i.indicador.responsable }}</center></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+  <hr width="500">
+  </div>
+  <h2>Estado Indicadores</h2>
+  <div class="col-12 mb-3">
+        <table class="table" border="1">
+          <thead>
+            <tr>
+              <th class="text-center" scope="col">Nombre Indicador</th>
+              <th class="text-center" scope="col">Meta</th>
+              <th class="text-center" scope="col">Acumulado</th>
+              <th class="text-center" scope="col">Porcentaje</th>
+              <th class="text-center" scope="col">Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              {% for i in id %}
+              <td class="text-center"><center>{{ i.indicador.nombre_kpi }}</center></td> 
+              <td class="text-center"><center>{{ i.indicador.meta_kpi }}</center></td>
+              <td class="text-center"><center>{{ i.acumulado }}</center></td>
+              {% if i.acumulado >= i.indicador.meta_kpi %}
+              <td class="text-center" style="color:rgba(1, 161, 73, 0.692);"><center>{{ i.porcentaje }}% &#8593;</center></td>
+              <td class="text-center" style="color:rgba(1, 161, 73, 0.692);"><center>Completado </center></td>
+              {% else %}
+              <td class="text-center" style="color:rgba(255,0,0,0.5);"><center>{{ i.porcentaje }}% &#8595;</center></td>
+              <td class="text-center" style="color:rgba(255,0,0,0.5);"><center>Incompleto</center></td>
+              {% endif %}    
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <hr>
+      <h2>Porcentajes</h2>
+      <table class="table" border="1"> 
+        <tr>
+          <td>Completos</td>
+          <td>{{ completo }}%</td>
+        </tr>
+        <tr>
+          <td>Incompletos</td>
+          <td>{{ incompleto }}%</td>
+        </tr>
+      </table>
+      <div class="col-md-4 mb-5" style="margin-left: 160px">
+        <div class="card h-100">
+          <canvas id="myChart2" height="400" width="500" ></canvas>
+        </div>
+      </div>
+     <canvas id="canvas"></canvas>
+  </div>
+  <div id='chart_div'></div>
+  {% else %}
+  <h1>NO tiene nada</h1>
+  {% endif %}
+</body>
+{% endblock content %}

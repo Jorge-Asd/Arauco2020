@@ -1,0 +1,736 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+
+    {% block stylesheets %}
+      <!-- Iconos CSS -->
+      <link rel="stylesheet" href="{% static 'css2/fontello.css' %}">
+      <!-- Bootstrap CSS -->
+      <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}">
+      <!-- Font awesome CSS -->
+      <link rel="stylesheet" href="{% static 'assets/fonts/font-awesome-4.7.0/css/font-awesome.min.css' %}">
+      
+      <style media="screen">
+        .invalid {
+          color: #dc3545;
+          font-size: 80%;
+        }
+        body {
+          display: flex;
+          flex-direction: column;
+          min-height: 100vh;
+        }
+        .footer {
+          margin: auto 0 0;
+          height: 56px;
+        }
+        
+      </style>
+      <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+      <script type="text/javascript">
+        google.charts.load('current', {'packages':['table']});
+        google.charts.setOnLoadCallback(drawTable);
+  
+        function drawTable() {
+          var data = new google.visualization.DataTable();
+          data.addColumn('string', 'Accion');
+          data.addColumn('string', 'Fecha Plazo');
+          data.addColumn('string', 'Incidente Asociado');
+          data.addColumn('string', 'Responsable');
+          data.addColumn('boolean', 'Estado');
+          data.addRows([
+            {% for i in compromisos %}
+            {% if i.estado_compromiso == 1 %}
+            ['{{i.correcion_incidente}}', '{{i.fecha_plazo}}','{{i.id_incidente}}','{{i.responsable}}' ,true],
+            {% else %}
+            ['{{i.correcion_incidente}}', '{{i.fecha_plazo}}','{{i.id_incidente}}','{{i.responsable}}' ,false],
+            {% endif %}
+            {% endfor %}
+          ]);
+  
+          var table = new google.visualization.Table(document.getElementById('table_div'));
+  
+          table.draw(data, {showRowNumber: true, width: '100%', height: '100%'});
+
+          google.charts.load("current", {packages:["corechart"]});
+          google.charts.setOnLoadCallback(drawChart);
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['Tareas', 'Hours per Day'],
+          ['Completas',{{completas}}],
+          ['Pendientes',{{pendientes}}],
+          ['En Proceso',{{proceso}}],
+        ]);
+
+        var options = {
+          title: 'Compromisos',
+          is3D: true,
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('piechart_3d'));
+        chart.draw(data, options);
+      }
+        }
+        google.charts.load('current', {'packages':['bar']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['Compromisos', 'Completas', 'Pendientes', 'En Proceso'],
+          ['Estado', {{completas}}, {{pendientes}},{{proceso}} ],
+
+        ]);
+
+        var options = {
+          chart: {
+            title: 'Estado Compromisos',
+            subtitle: 'Estado de los compromisos con fecha: '+"{{fecha}}",
+          }
+        };
+
+        var chart = new google.charts.Bar(document.getElementById('columnchart_material'));
+
+        chart.draw(data, google.charts.Bar.convertOptions(options));
+      }
+      </script>
+        <style>
+  @import url(//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css);}
+  @import url(https://fonts.googleapis.com/css?family=Titillium+Web:300);
+.fa-2x {
+font-size: 2em;
+}
+.fa {
+position: relative;
+display: table-cell;
+width: 60px;
+height: 36px;
+text-align: center;
+vertical-align: middle;
+font-size:20px;
+}
+
+
+.main-menu:hover,nav.main-menu.expanded {
+width:250px;
+overflow:visible;
+}
+
+.main-menu {
+background:#212121;
+border-right:1px solid #e5e5e5;
+position:fixed;
+top:0;
+bottom:0;
+height: auto;
+left:0;
+width:60px;
+overflow:hidden;
+-webkit-transition:width .05s linear;
+transition:width .05s linear;
+-webkit-transform:translateZ(0) scale(1,1);
+z-index:1000;
+}
+
+.main-menu>ul {
+margin:7px 0;
+}
+
+.main-menu li {
+position:relative;
+display:block;
+width:250px;
+}
+
+.main-menu li>a {
+position:relative;
+display:table;
+border-collapse:collapse;
+border-spacing:0;
+color:#999;
+ font-family: arial;
+font-size: 14px;
+text-decoration:none;
+-webkit-transform:translateZ(0) scale(1,1);
+-webkit-transition:all .1s linear;
+transition:all .1s linear;
+  
+}
+
+.main-menu .nav-icon {
+position:relative;
+display:table-cell;
+width:60px;
+height:36px;
+text-align:center;
+vertical-align:middle;
+font-size:18px;
+}
+
+.main-menu .nav-text {
+position:relative;
+display:table-cell;
+vertical-align:middle;
+width:190px;
+  font-family: 'Titillium Web', sans-serif;
+}
+
+.main-menu>ul.logout {
+position:absolute;
+left:0;
+bottom:0;
+}
+
+.no-touch .scrollable.hover {
+overflow-y:hidden;
+}
+
+.no-touch .scrollable.hover:hover {
+overflow-y:auto;
+overflow:visible;
+}
+
+a:hover,a:focus {
+text-decoration:none;
+}
+
+nav {
+-webkit-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+-o-user-select:none;
+user-select:none;
+}
+
+nav ul,nav li {
+outline:0;
+margin:0;
+padding:0;
+}
+.main-menu li:hover>a,nav.main-menu li.active>a,.dropdown-menu>li>a:hover,.dropdown-menu>li>a:focus,.dropdown-menu>.active>a,.dropdown-menu>.active>a:hover,.dropdown-menu>.active>a:focus,.no-touch .dashboard-page nav.dashboard-menu ul li:hover a,.dashboard-page nav.dashboard-menu ul li.active a {
+color:#fff;
+background-color:#5fa2db;
+}
+.area {
+float: left;
+background: #e2e2e2;
+width: 100%;
+height: 100%;
+}
+@font-face {
+  font-family: 'Titillium Web';
+  font-style: normal;
+  font-weight: 300;
+  src: local('Titillium WebLight'), local('TitilliumWeb-Light'), url(http://themes.googleusercontent.com/static/fonts/titilliumweb/v2/anMUvcNT0H1YN4FII8wpr24bNCNEoFTpS2BTjF6FB5E.woff) format('woff');
+}
+  </style>
+    {% endblock stylesheets %}
+    <title>Prototipo v2.0</title>
+  </head>
+  {% include "_modal.html" %}
+  <body>
+  {% if not user.is_anonymous and user.is_staff and user.is_superuser%}
+
+<header>
+  <input type="checkbox" id="btn-menu">
+  <label for="btn-menu" class="icon-menu"></label>
+  <nav class="menu">
+    <ul>
+      <li class="submenu"><a href="{% url 'index'%}">Horcones 2<span></span></a>
+      <li><a href="{% url 'index'%}">Inicio<span class="icon-home"></span></a></li>
+      <li class="submenu"><a href="#">Listas<span class="icon-down-open"></span></a>
+        <ul>
+          <li><a href="{% url 'lista_incidentes' %}">Lista Incidentes</a></li>
+          <li><a href="{% url 'lista_compromisos' %}">Lista Compromisos</a></li>
+          <li><a href="{% url 'lista_reunion' %}">Lista Reuniones</a></li>
+        </ul>
+      </li>
+      <li class="submenu"><a href="#">Indicadores<span class="icon-down-open"></span></a>
+        <ul>
+          <li><a href="{% url 'balancedscorecard' 1 %}">Indicadores Financieros</a></li>
+          <li><a href="{% url 'balancedscorecard' 2 %}">Indicadores Clientes</a></li>
+          <li><a href="{% url 'balancedscorecard' 3 %}">Indicadores Procesos Internos</a></li>
+          <li><a href="{% url 'balancedscorecard' 4 %}">Indicadores Aprendizaje y Crecimiento</a></li>
+        </ul>
+      </li>
+      <li><a href="{% url 'reporte_indicadores' %}">Reporte Indicadores</a></li>
+      <li><a href="{% url 'logout' %}">Cerrar Sesión</a></li>
+    </ul>
+  </nav>
+</header>
+{% include "_header.html" %}
+<style>
+
+</style>
+  <div class="contenedor">
+    <a class="navbar-brand"><h2>Horcones 2</h2></a>
+      <div class="container mt-3">
+      <div class="row">
+      <div class="col">
+        <h4>
+          Compromisos
+        </h4>
+        <div id="table_div"></div>
+          <div id="piechart_3d" class="box" ></div>
+          <div id="columnchart_material" class="box" ></div>
+        <div class="row">
+          <div class="col-12 mb-3">
+                <div class="col-12 mb-3">
+                  {% if compromisos %}
+                    <div class="table-container">
+              <table class="table-rwd">
+                <thead>
+                  <tr>
+                    <th class="text-center" scope="col">#</th>
+                    <th class="text-center" scope="col">Accion</th>
+                    <th class="text-center" scope="col">Fecha Plazo</th>
+                    <th class="text-center" scope="col">Estado</th>
+                    <th class="text-center" scope="col">Nombre de incidente</th>
+                    <th class="text-center" scope="col">Responsable</th>
+                    <th class="text-center" scope="col">Modificar</th>
+                  </tr>
+                </thead>
+                <tbody>
+              {% for i in compromisos %}
+                  <tr>
+                    <th class="text-center" scope="row">{{ forloop.counter }}</th>
+                    <td class="text-center">{{ i.correcion_incidente }}</td>
+                    <td class="text-center">{{ i.fecha_plazo }}</td>
+                {% if i.estado_compromiso == 3 %}
+                    <td class="text-center">Pendiente</td>
+                  {% else %}
+                {% if i.estado_compromiso == 2 %}
+                    <td class="text-center">En Proceso</td>
+                  {% else %}
+                {% if i.estado_compromiso == 1 %}
+                    <td class="text-center">Completado</td>
+                {% endif %}
+                {% endif %}
+                {% endif %}
+                    <td class="text-center">{{ i.id_incidente }}</td>
+                    <td class="text-center">{{ i.responsable }}</td>
+                    <td class="text-center">
+                    <button type="button" class="update-compromisos btn btn-sm btn-primary" data-id="{% url 'actualizar_compromisos' i.pk %}">
+                    <span class="fa fa-pencil"></span></button></td>
+                  </tr>
+              {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            <a class="btn btn-danger" href="{% url 'index' %}">Volver</a>
+                  {% else %}
+                    <p class="no-books text-primary">No Existen Registros</p>
+                    <div class="row">
+                        <td class="text-center">
+                          <a class="btn btn-danger" href="{% url 'index' %}">Volver</a>
+                        </td>
+                      </div>
+                  {% endif %}
+                </div>
+            </div>
+          </div>
+        </div>
+            {% else %}
+            {% if not user.is_anonymous and user.is_staff %}
+<header>
+  <input type="checkbox" id="btn-menu">
+  <label for="btn-menu" class="icon-menu"></label>
+  <nav class="menu">
+    <ul>
+      <li class="submenu"><a href="{% url 'index'%}">Horcones 2<span></span></a>
+      <li><a href="{% url 'index'%}">Inicio<span class="icon-home"></span></a></li>
+      <li class="submenu"><a href="#">Listas<span class="icon-down-open"></span></a>
+        <ul>
+          <li><a href="{% url 'lista_incidentes' %}">Lista Incidentes</a></li>
+          <li><a href="{% url 'lista_compromisos' %}">Lista Compromisos</a></li>
+          <li><a href="{% url 'lista_reunion' %}">Lista Reuniones</a></li>
+        </ul>
+      </li>
+      <li class="submenu"><a href="#">Indicadores<span class="icon-down-open"></span></a>
+        <ul>
+          <li><a href="{% url 'balancedscorecard' 1 %}">Indicadores Financieros</a></li>
+          <li><a href="{% url 'balancedscorecard' 2 %}">Indicadores Clientes</a></li>
+          <li><a href="{% url 'balancedscorecard' 3 %}">Indicadores Procesos Internos</a></li>
+          <li><a href="{% url 'balancedscorecard' 4 %}">Indicadores Aprendizaje y Crecimiento</a></li>
+        </ul>
+      </li>
+      <li><a href="{% url 'reporte_indicadores' %}">Reporte Indicadores</a></li>
+      <li><a href="{% url 'logout' %}">Cerrar Sesión</a></li>
+    </ul>
+  </nav>
+</header>
+{% include "_header.html" %}
+<div class="contenedor">
+    <a class="navbar-brand"><h2>Horcones 2</h2></a>
+      <div class="container mt-3">
+      <div class="row">
+      <div class="col">
+        <h4>
+          Compromisos
+        </h4>
+        <div id="table_div"></div>
+          <div id="piechart_3d" class="box" ></div>
+          <div id="columnchart_material" class="box" ></div>
+        <div class="row">
+          <div class="col-12 mb-3">
+                <div class="col-12 mb-3">
+                  {% if compromisos %}
+                    <div class="table-container">
+              <table class="table-rwd">
+                <thead>
+                  <tr>
+                    <th class="text-center" scope="col">#</th>
+                    <th class="text-center" scope="col">Accion</th>
+                    <th class="text-center" scope="col">Fecha Plazo</th>
+                    <th class="text-center" scope="col">Estado</th>
+                    <th class="text-center" scope="col">Nombre de incidente</th>
+                    <th class="text-center" scope="col">Responsable</th>
+                    <th class="text-center" scope="col">Modificar</th>
+                  </tr>
+                </thead>
+                <tbody>
+              {% for i in compromisos %}
+                  <tr>
+                    <th class="text-center" scope="row">{{ forloop.counter }}</th>
+                    <td class="text-center">{{ i.correcion_incidente }}</td>
+                    <td class="text-center">{{ i.fecha_plazo }}</td>
+                {% if i.estado_compromiso == 3 %}
+                    <td class="text-center">Pendiente</td>
+                  {% else %}
+                {% if i.estado_compromiso == 2 %}
+                    <td class="text-center">En Proceso</td>
+                  {% else %}
+                {% if i.estado_compromiso == 1 %}
+                    <td class="text-center">Completado</td>
+                {% endif %}
+                {% endif %}
+                {% endif %}
+                    <td class="text-center">{{ i.id_incidente }}</td>
+                    <td class="text-center">{{ i.responsable }}</td>
+                    <td class="text-center">
+                    <button type="button" class="update-compromisos btn btn-sm btn-primary" data-id="{% url 'actualizar_compromisos' i.pk %}">
+                    <span class="fa fa-pencil"></span></button></td>
+                  </tr>
+              {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            <a class="btn btn-danger" href="{% url 'index' %}">Volver</a>
+                  {% else %}
+                    <p class="no-books text-primary">No Existen Registros</p>
+                    <div class="row">
+                        <td class="text-center">
+                          <a class="btn btn-danger" href="{% url 'index' %}">Volver</a>
+                        </td>
+                      </div>
+                  {% endif %}
+                </div>
+            </div>
+          </div>
+        </div>
+            {% else %}
+            <button class="login-btn btn btn-primary" type="button" name="button">Log in</button>
+          {% endif %}
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    <!-- Includes -->
+    {% include "_footer.html" %}
+
+    <!-- JavaScript -->
+      
+      <script src="{% static 'assets/js/jquery-3.2.1.min.js' %}"></script>
+      <script src="{% static 'assets/js/popper.min.js' %}"></script>
+      <script src="{% static 'assets/js/bootstrap.min.js' %}"></script>
+      <!-- You can alternatively load the minified version -->
+      <script src="{% static 'js/jquery.bootstrap.modal.forms.js' %}"></script>
+      <script src="vendor2/jquery/jquery.min.js"></script>
+      <script src="vendor2/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+      <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js"></script>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+    </body>
+  </html>
+
+  <!--                                          CSS y SCRIPT            -->
+  <script type="text/javascript">
+    $(function () {
+      // Log in & Sign up buttons
+      $(".login-btn").modalForm({formURL: "{% url 'login' %}"});
+      $(".signup-btn").modalForm({formURL: "{% url 'registro' %}"});
+
+        // crear informacion kpi
+      $(".info-kpi").each(function () {
+        $(this).modalForm({formURL: $(this).data('id')});
+      });
+
+      // Update book buttons
+      $(".update-compromisos").each(function () {
+        $(this).modalForm({formURL: $(this).data('id')});
+      });
+
+      // Read book buttons
+      $(".detalle-compromisos").each(function () {
+        $(this).modalForm({formURL: $(this).data('id')});
+      });
+
+      // Delete book buttons
+      $(".delete-book").each(function () {
+        $(this).modalForm({formURL: $(this).data('id')});
+      })
+
+      // Hide message
+      $(".alert").fadeTo(2000, 500).slideUp(500, function(){
+        $(".alert").slideUp(500);
+      });
+
+    });
+          //Funcion para movil - cerrar y abrir menu
+      $(document).ready(function(){ 
+        $(".submenu").click(function(){ 
+        $(this).children("ul").slideToggle(); 
+        
+        var Grupo = $(this).parent();
+        var posicion = $(this).index();
+        Grupo.children().each(function (index) {
+        if (index != posicion)
+          $(this).children("ul").slideUp("slow");
+        });
+      })
+      
+        $("ul").click(function(p){ 
+        p.stopPropagation(); 
+      });
+      })
+  </script>
+  
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+      <script src="{% static 'assets/js/jquery-3.2.1.min.js' %}"></script>
+      <script src="{% static 'assets/js/popper.min.js' %}"></script>
+      <script src="{% static 'assets/js/bootstrap.min.js' %}"></script>
+      <script src="{% static 'js/jquery.bootstrap.modal.forms.js' %}"></script>
+      <!-- Menu CSS-->
+<style>
+* {
+  margin:0;
+  padding: 0;
+  box-sizing: border-box;
+  }
+
+body {
+  margin: 0;
+  font-family: sans-serif;
+  color: #333; }
+.contenedor{
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+.main{
+  width: 70%;
+  background: #fff;
+  padding: 20px;
+  float: left;
+  box-sizing: border-box;
+}
+aside{
+  width: 30%;
+  padding: 20px;
+  box-sizing: border-box;
+  background: #ccc;
+  float: left;
+}
+h1 {
+  text-align: center;
+  color: #333; 
+  }
+
+.table-rwd {
+  font-size: .85em;
+  border: 1px solid rgba(181, 213, 144, 0.5);
+  color: #666;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto; }
+  .table-rwd td, .table-rwd th {
+    padding: .8em;
+    border-bottom: 1px solid rgba(181, 213, 144, 0.5); }
+  .table-rwd th {
+    background: #1A8CFF;
+    color: #fff;
+    font-weight: normal;
+    text-align: right; }
+  .table-rwd td {
+    text-align: right; }
+    .table-rwd td:before {
+      content: "";
+      color: #1A8CFF; }
+    .table-rwd td:after {
+      content: ""; }
+    .table-rwd td:first-of-type {
+      text-align: left; }
+      .table-rwd td:first-of-type:before {
+        content: ""; }
+      .table-rwd td:first-of-type:after {
+        content: ""; }
+  .table-rwd tr:hover {
+    background: rgba(181, 213, 144, 0.2); }
+  .table-rwd tr td:nth-child(2n) {
+    background: rgba(181, 213, 144, 0.2); }
+
+.table-container {
+  overflow-x: auto; }
+
+.table-rwd {
+  min-width: 900px; }
+  .table-rwd td:first-child {
+    position: absolute;
+    background: #fff;
+    width: 8em; }
+  .table-rwd th:first-child {
+    width: 8em; }
+  .table-rwd tr:hover td:first-child {
+    background: #1A8CFF;
+    color: #fff; }
+  .table-rwd tr:nth-child(2) td:first-child {
+    box-shadow: 0 -2.7em 0 -6px #1A8CFF, -6px -2.7em 0 -6px #1A8CFF; }
+
+header {
+  height: 55px;
+  background: #1A8CFF;
+  color: #fff;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  z-index: 1;
+}
+
+#btn-menu {
+  display: none;
+}
+
+header label{
+  font-size: 35px;
+  cursor: pointer;
+  display: none;
+}
+
+.menu ul{
+  background: #1A8CFF;
+  display: flex;
+  list-style: none;
+}
+.menu ul ul{
+  display: none;
+}
+.menu a{
+  display: block;
+  padding: 15px 20px;
+  color: #fff;
+  text-decoration: none;
+}
+.menu a:hover{
+  background: rgba(0, 0, 0, 0.3);
+}
+.menu a span{
+  margin-left: 5px;
+}
+.menu ul li:hover ul{
+  display: block;
+  position: absolute;
+}
+
+@media (max-width: 765px){
+  header label{
+    display: block;
+  }
+  .main{
+    width: 100%;
+  }
+  aside{
+    width: 100%;
+  }
+
+  .menu{
+    position:absolute;
+    top: 55px;
+    left: 0;
+    width: 100%;
+    transform: translateX(-100%);
+    transition:  all 0.3s;
+  }
+
+  .menu ul{
+    display:block;
+    background: #555;
+  }
+  .menu ul li:hover ul{
+    display: none;
+    position: static;
+  }
+  .menu a span{
+    position: absolute;
+    right: 5px;
+  }
+  #btn-menu:checked ~ .menu{
+    transform: translateX(0%);
+  }
+
+  .menu ul ul{
+    background: rgba(0, 0, 0, 4);
+  }
+  .menu ul ul a{
+    padding:15px 35px;
+
+  }
+  #container{
+    width: 10% !important;
+    background: #555;
+}
+  .container mt-3{
+    width: 10% !important;
+  }
+  #table{
+    width: 650px !important;
+  }
+}
+@media screen and (max-width: 400px){
+  .contenedor{
+    width: 100%;
+  }
+  aside{
+    display: none;
+  }
+}
+</style>
+
+<style>
+          .contenedord{
+            width: 100%;
+            height: auto;
+            background: #007bbf;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+          }
+          .box{
+            width: 100%;
+            height: 300px;
+            margin:20px;
+            box-sizing: border-box;
+            font-size: 15px;
+          }
+          @media (max-width: 765px){
+            .box{
+              width: 100%;
+            }
+          }
+          </style>

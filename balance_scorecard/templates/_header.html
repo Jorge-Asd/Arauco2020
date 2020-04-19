@@ -1,0 +1,29 @@
+{% load static %}
+
+<!-- Header -->
+ 
+    <!-- Custom fonts for this template-->
+  <link href="{% static 'vendor2/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+
+  <!-- Page level plugin CSS-->
+  <link href="{% static 'vendor2/datatables/dataTables.bootstrap4.css' %}" rel="stylesheet">
+
+  <!-- Custom styles for this template-->
+  <link href="{% static 'css2/sb-admin.css' %}" rel="stylesheet">
+  
+
+  <!-- Messages -->
+  <div>
+    {% if messages %}
+      {% for message in messages %}
+        <div style="border-radius:10;width: 60%;text-align: center;margin-left: 20%;margin-right: 20%" {% if message.tags %} class="alert alert-icon alert-{{ message.tags }} alert-dismissible fade show mb-0" role="alert"{% endif %}>
+          {{ message }}
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+  <!-- End Messages -->
+

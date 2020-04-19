@@ -1,0 +1,516 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+  {% include "_modal.html" %}
+  <!-- Styles -->
+<style>
+    #customers {
+      font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+      border-collapse: collapse;
+      width: 100%;
+    }
+        
+    #customers td, #customers th {
+      border: 1px solid #ddd;
+      text-align: left;
+      padding: 8px;
+    }
+        
+    #customers tr:nth-child(even){background-color: #f2f2f2}
+        
+    #customers tr:hover {background-color: #ddd;}
+        
+    #customers th {
+      padding-top: 12px;
+      padding-bottom: 12px;
+      background-color: #4CAF50;
+      color: white;
+    }
+     
+    #chartdiv {
+      width: 100%;
+      height: 500px;
+    }
+    #contenedor{
+  width: 1895px;
+  height: 1000px;
+  float: left;
+}
+
+#contenedora{
+  width: 740px;
+  height: 975px;
+  float: left;
+  border-radius: 1em;
+  margin: 0px;
+}
+
+#contenedoraa{
+  width: 345px;
+  height: 250px;
+  margin: 0.1em auto;
+  padding: 0.1em;
+  float: left;
+  border-radius: 1em;
+  margin: 10px;
+  background-color: E7FAF6;
+}
+
+#contenedorb{
+  width: 950px;
+  height: 400px;
+  margin: 0.1em auto;
+  padding: 0.1em;
+  border-radius: 1em;
+  margin: 10px;
+  display: inline-block;
+  background-color: E7FAF6;
+  
+}
+#contenedorc{
+  width: 950px;
+  height: 550px;
+  margin: 0.1em auto;
+  padding: 0.1em;
+  float: right;
+  border-radius: 1em;
+  margin: 10px;
+  background-color: E7FAF6;
+}
+
+
+#head{
+  height: 30px;
+  border-radius: 1em;
+}
+
+#chartdiv {
+  height: 220px;
+  border-radius: 1em;
+  }
+
+#chartdiv {
+  height: 220px;
+  border-radius: 1em;
+  }
+
+#minimo{
+  width: 50px;
+  height: 20px;
+  border-radius: 1em;
+  float: left;
+  margin-left: 40px;
+}
+
+
+
+.chartasist {
+  width: 100%;
+  height: 500px;
+}
+
+#graficos {
+display: inline-block; 
+margin: .5em auto; 
+padding: 0 .5em .5em; 
+font: 900 2em/1.2 arial;
+border-radius: .25em; 
+}
+
+#graficos .horizontal {
+  display: block; 
+  font: 900 .5em/1 monospace; 
+  text-align: left; 
+  margin: .2em 0; 
+  width: 10em; height: 1em; 
+  background-color: gainsboro; 
+  padding: 0; 
+  border-right: solid 2.5em transparent; /* truco para compensar bg-position */
+  background-image: linear-gradient(red, red); 
+  background-repeat: no-repeat; 
+  background-position: 2.5em 0; 
+  background-size: 0 100%; 
+}
+
+#graficos .arco {
+  display: block;
+  font: 600 .8em/7em calibri; 
+  text-align: center; 
+  margin: .2em auto; 
+  width: 8em; height: 4em; 
+  background-color: gainsboro; 
+  padding: 0; 
+  background-repeat: no-repeat; 
+  background-position: 0 0; 
+  background-size: 100% 100%, 100% 200%; 
+}
+
+.card{
+  width: 105% !important;
+}
+</style>
+<header>
+  <input type="checkbox" id="btn-menu">
+  <label for="btn-menu" class="icon-menu"></label>
+  <nav class="menu">
+    <ul>
+      <li class="submenu"><a href="{% url 'index'%}">Horcones 2<span></span></a>
+      <li><a href="{% url 'index'%}">Inicio<span class="icon-home"></span></a></li>
+      <li class="submenu"><a href="#">Listas<span class="icon-down-open"></span></a>
+        <ul>
+          <li><a href="{% url 'lista_incidentes' %}">Lista Incidentes</a></li>
+          <li><a href="{% url 'lista_compromisos' %}">Lista Compromisos</a></li>
+          <li><a href="{% url 'lista_reunion' %}">Lista Reuniones</a></li>
+        </ul>
+      </li>
+      <li class="submenu"><a href="#">Indicadores<span class="icon-down-open"></span></a>
+        <ul>
+          <li><a href="{% url 'balancedscorecard' 1 %}">Indicadores Financieros</a></li>
+          <li><a href="{% url 'balancedscorecard' 2 %}">Indicadores Clientes</a></li>
+          <li><a href="{% url 'balancedscorecard' 3 %}">Indicadores Procesos Internos</a></li>
+          <li><a href="{% url 'balancedscorecard' 4 %}">Indicadores Aprendizaje y Crecimiento</a></li>
+        </ul>
+      </li>
+      <li><a href="{% url 'reporte_indicadores' %}">Reporte Indicadores</a></li>
+      <li><a href="{% url 'logout' %}">Cerrar Sesión</a></li>
+    </ul>
+  </nav>
+</header>
+    {% include "_header.html" %}
+
+<div class="contenedor">
+    <a class="navbar-brand"><h2>Horcones 2</h2></a>
+  <div class="container mt-3">
+    <div class="row">
+      <div class="col">
+        <h4>Indicadores</h4>
+        <div class="row">
+          <div class="col-12 mb-3">
+            {% if not user.is_anonymous and user.is_superuser  %}
+                <div class="col-12 mb-3">
+                
+                  {% if indicador  %}
+                  {% for i in indicador %}
+                    <div class="col-md-4 mb-5" style="float:left;" >
+                      <div class="card h-100" id="graficos">
+                        <h4 class="card-title" style="text-align: center">{{ i.indicador.nombre_kpi }}</h4>
+                        {%if i.acumulado >= i.meta_mensual%}
+                        
+                        <figure class="arco">100%</figure>
+                        <h6 style="text-align: center;">Completo + {{i.porcentaje}}%</h6>
+                        {%else %}
+                        
+                        <figure class="arco">{{ i.porcentaje}} %</figure>
+                        <h6 style="text-align: center;">Incompleto</h6>
+                        {% endif %}
+
+                        <div class="card-body">
+                            <h6>Meta: {{ i.indicador.meta_kpi }} {{i.indicador.unidad_medida}}</h6>
+                            <h6>Actual: {{i.acumulado}} {{i.indicador.unidad_medida}} </h6>
+                        </div>
+                        <div class="card-footer">
+                          <a class="btn btn-danger" href="{% url 'home' i.indicador.pk %}">Detalle</a>
+                          <a class="btn btn-danger" href="{% url 'index' %}">Volver</a>
+                        </div>
+                      </div>
+                    </div>
+                  {% endfor %}
+                    <!-- Nombre Indicadores 
+                            <th class="text-center" scope="row">{{ forloop.counter }}</th>
+                            <td class="text-center">{{ i.indicador.nombre_kpi }}</td>
+                            <td class="text-center">{{ i.indicador.meta_kpi }}</td>
+                            <td class="text-center">{{ i.acumulado }}</td>
+                    -->
+                  {% else %}
+                    
+                    <div class="main">
+                        <td class="text-center">
+                          <p class="no-books text-primary">No Existen Registros</p>
+                         <!-- <a class="btn btn-danger" href="{% url 'index' %}">Volver</a>-->
+                        </td>
+                      </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+            {% else %}
+            {% if not user.is_anonymous and user.is_staff  %}
+            <span>
+              <strong></strong>
+            </span>
+              <div class="col-12 mb-3">
+              
+                {% if indicador  %}
+                  {% for i in indicador %}
+                    <div class="col-md-4 mb-5" style="float:left;" >
+                      <div class="card h-100" id="graficos">
+                        <h4 class="card-title" style="text-align: center">{{ i.indicador.nombre_kpi }}</h4>
+                        {%if i.acumulado >= i.meta_mensual%}
+                        
+                        <figure class="arco">100%</figure>
+                        <h6 style="text-align: center;">Completo + {{i.porcentaje}}%</h6>
+                        {%else %}
+                        
+                        <figure class="arco">{{ i.porcentaje}} %</figure>
+                        <h6 style="text-align: center;">Incompleto</h6>
+                        {% endif %}
+
+                        <div class="card-body">
+                            <h6>Meta: {{ i.indicador.meta_kpi }} {{i.indicador.unidad_medida}}</h6>
+                            <h6>Actual: {{i.acumulado}} {{i.indicador.unidad_medida}} </h6>
+                        </div>
+                        <div class="card-footer">
+                          <a class="btn btn-danger" href="{% url 'home' i.indicador.pk %}">Detalle</a>
+                          <a class="btn btn-danger" href="{% url 'index' %}">Volver</a>
+                        </div>
+                      </div>
+                    </div>
+                  {% endfor %}
+                {% else %}
+                  <p class="no-books text-primary">No Existen Registros</p>
+                  <div class="row">
+                      <td class="text-center">
+                       <!-- <a class="btn btn-danger" href="{% url 'index' %}">Volver</a>-->
+                      </td>
+                    </div>
+                {% endif %}
+              </div>
+        </div>
+      </div>
+          {% else %}
+            <button class="login-btn btn btn-primary" type="button" name="button">Log in</button>
+          {% endif %}
+            {% endif %}
+          </div>
+        </div>
+
+
+{% endblock content %}
+
+{% block extrascripts %}
+            <script src="../amcharts.js"></script>
+            <script src="https://www.amcharts.com/lib/3/gauge.js"></script>
+            <script src="https://www.amcharts.com/lib/3/plugins/export/export.min.js"></script>
+            <link rel="stylesheet" href="https://www.amcharts.com/lib/3/plugins/export/export.css" type="text/css" media="all" />
+            <script src="https://www.amcharts.com/lib/3/themes/light.js"></script>
+  
+  <script type="text/javascript">
+    $(function () {
+      // Log in & Sign up buttons
+      $(".login-btn").modalForm({formURL: "{% url 'login' %}"});
+      $(".signup-btn").modalForm({formURL: "{% url 'registro' %}"});
+
+      // Hide message
+      $(".alert").fadeTo(2000, 500).slideUp(500, function(){
+        $(".alert").slideUp(500);
+      });
+    });
+  </script>
+
+<!-- Resources -->
+<script src="https://www.amcharts.com/lib/4/core.js"></script>
+<script src="https://www.amcharts.com/lib/4/charts.js"></script>
+<script src="https://www.amcharts.com/lib/4/themes/animated.js"></script>
+<!--                                                                                  Grafico Cuadro de Mando                                                                                      -->
+<script type="text/javascript">
+    function ajusta() {
+var horizontales = document.querySelectorAll("#graficos .horizontal"); 
+var arcos = document.querySelectorAll("#graficos .arco"); 
+
+
+var elem = 0; 
+while(elem < horizontales.length) {
+horizontales[elem].style.transition = "background-size 3s ease-in-out 2s"; 
+horizontales[elem].style.backgroundSize = horizontales[elem].innerHTML+" 100%"; 
+elem++; 
+}; 
+
+elem = 0;
+
+
+while(elem<arcos.length ) {
+  var num =parseInt(arcos[elem].innerHTML);  
+	if(num >= 70){
+		console.log(num)
+		arcos[elem].style.backgroundImage = "radial-gradient(circle at bottom, white 45%, transparent 47%, transparent 67%, white 70%), linear-gradient("
+		+ (parseInt(arcos[elem].innerHTML) / 100) * 180 +
+		"deg, green 50%, transparent 50%)"; 
+		elem++;
+	}
+	else{
+		if(num < 70 && num >30){
+		console.log(num)
+		arcos[elem].style.backgroundImage = "radial-gradient(circle at bottom, white 45%, transparent 47%, transparent 67%, white 70%), linear-gradient("
+		+ (parseInt(arcos[elem].innerHTML) / 100) * 180 +
+		"deg, orange 50%, transparent 50%)"; 
+		elem++;
+		}
+		else{
+			if(num <= 30){
+			console.log(num)
+			arcos[elem].style.backgroundImage = "radial-gradient(circle at bottom, white 45%, transparent 47%, transparent 67%, white 70%), linear-gradient("
+			+ (parseInt(arcos[elem].innerHTML) / 100) * 180 +
+			"deg, red 50%, transparent 50%)"; 
+			elem++;
+			}
+		}
+	}
+}; 
+
+}
+
+onload = ajusta; 
+
+</script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<style>
+@import url(//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css);
+@import url(https://fonts.googleapis.com/css?family=Titillium+Web:300);
+
+.fa-2x {
+font-size: 2em;
+}
+.fa {
+position: relative;
+display: table-cell;
+width: 60px;
+height: 36px;
+text-align: center;
+vertical-align: middle;
+font-size:20px;
+}
+
+.main-menu:hover,nav.main-menu.expanded {
+width:250px;
+overflow:visible;
+}
+
+.main-menu {
+background:#212121;
+border-right:1px solid #e5e5e5;
+position:fixed;
+top:0;
+bottom:0;
+height: auto;
+left:0;
+width:60px;
+overflow:hidden;
+-webkit-transition:width .05s linear;
+transition:width .05s linear;
+-webkit-transform:translateZ(0) scale(1,1);
+z-index:1000;
+}
+
+.main-menu>ul {
+margin:7px 0;
+}
+
+.main-menu li {
+position:relative;
+display:block;
+width:250px;
+}
+
+.main-menu li>a {
+position:relative;
+display:table;
+border-collapse:collapse;
+border-spacing:0;
+color:#999;
+ font-family: arial;
+font-size: 14px;
+text-decoration:none;
+-webkit-transform:translateZ(0) scale(1,1);
+-webkit-transition:all .1s linear;
+transition:all .1s linear;
+}
+
+.main-menu .nav-icon {
+position:relative;
+display:table-cell;
+width:60px;
+height:36px;
+text-align:center;
+vertical-align:middle;
+font-size:18px;
+}
+
+.main-menu .nav-text {
+position:relative;
+display:table-cell;
+vertical-align:middle;
+width:190px;
+  font-family: 'Titillium Web', sans-serif;
+}
+
+.main-menu>ul.logout {
+position:absolute;
+left:0;
+bottom:0;
+}
+
+.no-touch .scrollable.hover {
+overflow-y:hidden;
+}
+
+.no-touch .scrollable.hover:hover {
+overflow-y:auto;
+overflow:visible;
+}
+
+a:hover,a:focus {
+text-decoration:none;
+}
+
+nav {
+-webkit-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+-o-user-select:none;
+user-select:none;
+}
+
+nav ul,nav li {
+outline:0;
+margin:0;
+padding:0;
+}
+.main-menu li:hover>a,nav.main-menu li.active>a,.dropdown-menu>li>a:hover,.dropdown-menu>li>a:focus,.dropdown-menu>.active>a,.dropdown-menu>.active>a:hover,.dropdown-menu>.active>a:focus,.no-touch .dashboard-page nav.dashboard-menu ul li:hover a,.dashboard-page nav.dashboard-menu ul li.active a {
+color:#fff;
+background-color:#5fa2db;
+}
+.area {
+float: left;
+background: #e2e2e2;
+width: 100%;
+height: 100%;
+}
+@font-face {
+  font-family: 'Titillium Web';
+  font-style: normal;
+  font-weight: 300;
+  src: local('Titillium WebLight'), local('TitilliumWeb-Light'), url(http://themes.googleusercontent.com/static/fonts/titilliumweb/v2/anMUvcNT0H1YN4FII8wpr24bNCNEoFTpS2BTjF6FB5E.woff) format('woff');
+}
+</style>
+<script>
+      //Funcion para movil - cerrar y abrir menu
+      $(document).ready(function(){ 
+        $(".submenu").click(function(){ 
+        $(this).children("ul").slideToggle(); 
+        
+        var Grupo = $(this).parent();
+        var posicion = $(this).index();
+        Grupo.children().each(function (index) {
+        if (index != posicion)
+          $(this).children("ul").slideUp("slow");
+        });
+      })
+      
+        $("ul").click(function(p){ 
+        p.stopPropagation(); 
+      });
+      })
+</script>
+{% endblock extrascripts %}
